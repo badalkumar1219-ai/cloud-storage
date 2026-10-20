@@ -28,7 +28,7 @@ import {
 import "./App.css";
 
 function App() {
-  const { user, loading: authLoading, demoMode } = useAuth();
+  const { user, loading: authLoading, demoMode, canUpload } = useAuth();
 
   // ─── State ──────────────────────────────────────────
   const [activeNav, setActiveNav] = useState("my-files");
@@ -115,6 +115,10 @@ function App() {
   // ─── File actions ──────────────────────────────────
 
   async function handleUpload(selectedFiles) {
+    if (!canUpload) {
+      addToast("File uploads are restricted to the authorized account", "warning");
+      return;
+    }
     if (demoMode) {
       addToast("Configure AWS S3 credentials to enable uploads", "warning");
       return;
@@ -343,7 +347,7 @@ function App() {
           </div>
 
           {/* Upload area (only on My Files) */}
-          {activeNav === "my-files" && (
+          {activeNav === "my-files" && canUpload && (
             <UploadArea onFilesSelected={handleUpload} uploading={uploading} />
           )}
 

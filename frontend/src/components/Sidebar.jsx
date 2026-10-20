@@ -14,7 +14,7 @@ function Sidebar({
   storageUsed,
   storageLimit,
 }) {
-  const { demoMode } = useAuth();
+  const { demoMode, canUpload } = useAuth();
 
   const navItems = [
     { id: "my-files", label: "My Files", icon: "📁" },
@@ -36,9 +36,11 @@ function Sidebar({
 
       {/* Action Buttons */}
       <div className="sidebar-actions">
-        <button className="btn btn-upload" onClick={onUploadClick}>
-          <span className="btn-icon">⬆️</span> Upload Files
-        </button>
+        {canUpload && (
+          <button className="btn btn-upload" onClick={onUploadClick}>
+            <span className="btn-icon">⬆️</span> Upload Files
+          </button>
+        )}
         <button className="btn btn-folder" onClick={onNewFolderClick}>
           <span className="btn-icon">➕</span> New Folder
         </button>

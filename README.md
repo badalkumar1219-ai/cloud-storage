@@ -108,7 +108,13 @@ Visit **http://localhost:5173** — you'll see the full dashboard with demo data
    cp .env.example backend/.env
    ```
 9. Fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
-10. Restart the backend
+10. Set `UPLOAD_AUTHORIZED_EMAIL` in `backend/.env` to the Gmail account allowed to upload files
+11. Restart the backend
+
+Only the configured account can upload files. The backend checks the signed-in Google account
+on every file-upload request; other signed-in users can still use the other available features.
+The upload controls are also hidden for accounts without upload permission. If
+`UPLOAD_AUTHORIZED_EMAIL` is unset, uploads are denied to everyone.
 
 ---
 

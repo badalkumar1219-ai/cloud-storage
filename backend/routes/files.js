@@ -24,7 +24,10 @@ const {
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const { s3Client, BUCKET_NAME, isS3Configured } = require("../config/s3");
-const { isAuthenticated } = require("../middleware/auth");
+const {
+  isAuthenticated,
+  requireAuthorizedUploader,
+} = require("../middleware/auth");
 
 // Multer stores uploaded files in memory before sending to S3
 const upload = multer({
@@ -211,6 +214,7 @@ router.get("/", isAuthenticated, async (req, res) => {
 router.post(
   "/upload",
   isAuthenticated,
+  requireAuthorizedUploader,
   upload.array("files", 10),
   async (req, res) => {
     try {

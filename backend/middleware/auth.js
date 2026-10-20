@@ -29,4 +29,25 @@ function isAuthenticated(req, res, next) {
   return next();
 }
 
-module.exports = { isAuthenticated };
+function isAuthorizedUploader(user) {
+  const authorizedEmail = process.env.UPLOAD_AUTHORIZED_EMAIL?.trim().toLowerCase();
+  const userEmail = user?.email?.trim().toLowerCase();
+
+  return Boolean(authorizedEmail && userEmail && userEmail === authorizedEmail);
+}
+
+function requireAuthorizedUploader(req, res, next) {
+  if (!isAuthorizedUploader(req.user)) {
+    return res.status(403).json({
+      error: "File uploads are restricted to the authorized account.",
+    });
+  }
+
+  return next();
+}
+
+module.exports = {
+  isAuthenticated,
+  isAuthorizedUploader,
+  requireAuthorizedUploader,
+};

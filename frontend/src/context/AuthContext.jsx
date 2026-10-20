@@ -13,6 +13,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [demoMode, setDemoMode] = useState(false);
+  const [canUpload, setCanUpload] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Check if user is logged in on app load
@@ -22,9 +23,11 @@ export function AuthProvider({ children }) {
         const data = await getMe();
         setUser(data.user);
         setDemoMode(data.demoMode);
+        setCanUpload(data.canUpload === true);
       } catch (err) {
         console.error("Auth check failed:", err);
         setUser(null);
+        setCanUpload(false);
       } finally {
         setLoading(false);
       }
@@ -45,6 +48,7 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     demoMode,
+    canUpload,
     loading,
     logout: handleLogout,
   };
@@ -54,7 +58,7 @@ export function AuthProvider({ children }) {
 
 /**
  * Hook to access auth state in any component.
- * Usage: const { user, demoMode, loading, logout } = useAuth();
+ * Usage: const { user, demoMode, canUpload, loading, logout } = useAuth();
  */
 export function useAuth() {
   const context = useContext(AuthContext);

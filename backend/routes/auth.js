@@ -9,6 +9,7 @@
 
 const router = require("express").Router();
 const passport = require("passport");
+const { isAuthorizedUploader } = require("../middleware/auth");
 
 const isOAuthConfigured =
   process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET;
@@ -49,9 +50,13 @@ router.get("/me", (req, res) => {
   if (isOAuthConfigured) {
     // Real auth mode
     if (req.isAuthenticated && req.isAuthenticated()) {
-      return res.json({ user: req.user, demoMode: false });
+      return res.json({
+        user: req.user,
+        demoMode: false,
+        canUpload: isAuthorizedUploader(req.user),
+      });
     }
-    return res.json({ user: null, demoMode: false });
+    return res.json({ user: null, demoMode: false, canUpload: false });
   }
 
   // Demo mode – return a demo user
@@ -63,6 +68,7 @@ router.get("/me", (req, res) => {
       avatar: "",
     },
     demoMode: true,
+    canUpload: false,
   });
 });
 
