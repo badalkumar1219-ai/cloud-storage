@@ -80,7 +80,7 @@
 }
 
 .share-email-input:focus {
-  border-color: #1a73e8;
+  border-color: var(--color-accent);
 }
 
 .share-permission {
@@ -95,12 +95,12 @@
 }
 
 .share-permission:focus {
-  border-color: #1a73e8;
+  border-color: var(--color-accent);
 }
 
 .share-send-btn {
   padding: 10px 20px;
-  background: #1a73e8;
+  background: var(--color-accent);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -112,7 +112,7 @@
 }
 
 .share-send-btn:hover:not(:disabled) {
-  background: #1557b0;
+  background: var(--color-accent-hover);
 }
 
 .share-send-btn:disabled {
@@ -198,14 +198,14 @@
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 13px;
-  color: #1a73e8;
+  color: var(--color-accent);
   background: #f8f9fa;
   outline: none;
   cursor: text;
 }
 
 .share-link-display:focus {
-  border-color: #1a73e8;
+  border-color: var(--color-accent);
 }
 
 .share-copy-btn,
@@ -220,7 +220,7 @@
 }
 
 .share-copy-btn:hover {
-  background: #e8f0fe;
+  background: var(--color-accent-soft);
 }
 
 .share-delete-link-btn:hover {
@@ -230,10 +230,10 @@
 .share-create-link-btn {
   width: 100%;
   padding: 12px;
-  border: 2px dashed #c4d7f2;
+  border: 2px dashed var(--color-accent-border);
   border-radius: 8px;
-  background: #f8fbff;
-  color: #1a73e8;
+  background: var(--color-accent-pale);
+  color: var(--color-accent);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -241,8 +241,8 @@
 }
 
 .share-create-link-btn:hover:not(:disabled) {
-  background: #eef4ff;
-  border-color: #1a73e8;
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
 }
 
 .share-create-link-btn:disabled {

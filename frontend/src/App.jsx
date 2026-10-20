@@ -7,6 +7,7 @@ import { useAuth } from "./context/AuthContext";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import FileTable from "./components/FileTable";
+import DashboardOverview from "./components/DashboardOverview";
 import UploadArea from "./components/UploadArea";
 import NewFolderModal from "./components/NewFolderModal";
 import ShareModal from "./components/ShareModal";
@@ -247,6 +248,12 @@ function App() {
 
   // Sort: folders first, then by name
   const sortedFiles = [...filteredFiles].sort((a, b) => {
+    if (activeNav === "recent") {
+      return (
+        new Date(b.lastModified || 0).getTime() -
+        new Date(a.lastModified || 0).getTime()
+      );
+    }
     if (a.isFolder && !b.isFolder) return -1;
     if (!a.isFolder && b.isFolder) return 1;
     return a.name.localeCompare(b.name);
@@ -338,6 +345,15 @@ function App() {
           {/* Upload area (only on My Files) */}
           {activeNav === "my-files" && (
             <UploadArea onFilesSelected={handleUpload} uploading={uploading} />
+          )}
+
+          {activeNav === "my-files" && (
+            <DashboardOverview
+              files={files}
+              storageUsed={storageUsed}
+              storageLimit={storageLimit}
+              onViewRecent={() => handleNavChange("recent")}
+            />
           )}
 
           {/* Recent files notice */}

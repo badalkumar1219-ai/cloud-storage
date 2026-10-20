@@ -1,0 +1,158 @@
+.dashboard-overview {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.5fr);
+  gap: 16px;
+}
+
+.overview-card {
+  min-width: 0;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #ece9f7;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(54, 35, 110, 0.05);
+}
+
+.overview-card h2 {
+  color: #29243b;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.overview-card p {
+  color: #777286;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.overview-card-heading,
+.recent-activity-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.overview-card-heading {
+  justify-content: flex-start;
+}
+
+.overview-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-accent-soft);
+  font-size: 20px;
+}
+
+.storage-summary-total {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 22px;
+}
+
+.storage-summary-total strong {
+  color: #29243b;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.storage-summary-total span {
+  color: #777286;
+  font-size: 12px;
+}
+
+.overview-progress {
+  height: 8px;
+  margin-top: 14px;
+  overflow: hidden;
+  background: #efedf5;
+  border-radius: 999px;
+}
+
+.overview-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #8b70ff, var(--color-accent));
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+.storage-summary .storage-summary-note {
+  margin-top: 9px;
+}
+
+.recent-activity-heading button {
+  padding: 6px 10px;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--color-accent-soft);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.recent-activity-heading button:hover {
+  background: var(--color-accent-soft-hover);
+}
+
+.recent-activity-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-activity-list li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.recent-file-icon {
+  display: grid;
+  flex: 0 0 36px;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  background: #f7f6fc;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.recent-file-details {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.recent-file-name {
+  overflow: hidden;
+  color: #393449;
+  font-size: 13px;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-file-meta {
+  color: #898497;
+  font-size: 11px;
+}
+
+.recent-activity .recent-activity-empty {
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-overview {
+    grid-template-columns: 1fr;
+  }
+}

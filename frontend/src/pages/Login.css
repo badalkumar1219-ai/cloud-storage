@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e8f0fe 0%, #ffffff 50%, #e8f0fe 100%);
+  background: linear-gradient(135deg, var(--color-accent-soft) 0%, #ffffff 50%, var(--color-accent-soft) 100%);
   padding: 20px;
 }
 
@@ -37,7 +37,7 @@
 .login-logo-text {
   font-size: 32px;
   font-weight: 700;
-  color: #1a73e8;
+  color: var(--color-accent);
   margin: 0;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .login-footer small {
-  color: #1a73e8;
+  color: var(--color-accent);
 }
 
 /* ---- Responsive ---- */

@@ -49,13 +49,15 @@ function Login() {
           Sign in with Google
         </button>
 
-        {/* Demo mode notice */}
         <div className="login-notice">
-          <p>
-            <strong>ℹ️ Note:</strong> Google OAuth is not configured yet.
-            Click the button above to see the setup instructions, or the app
-            will run in <strong>demo mode</strong> automatically.
-          </p>
+          {demoMode ? (
+            <p>
+              <strong>ℹ️ Note:</strong> Google OAuth is not configured yet.
+              The app is running in <strong>demo mode</strong>.
+            </p>
+          ) : (
+            <p>Sign in with Google to access your CloudBox files.</p>
+          )}
         </div>
 
         <p className="login-footer">

@@ -42,7 +42,7 @@
 }
 
 .modal-input:focus {
-  border-color: #1a73e8;
+  border-color: var(--color-accent);
 }
 
 .modal-actions {
@@ -77,10 +77,10 @@
 }
 
 .modal-btn-create {
-  background: #1a73e8;
+  background: var(--color-accent);
   color: #ffffff;
 }
 
 .modal-btn-create:hover:not(:disabled) {
-  background: #1557b0;
+  background: var(--color-accent-hover);
 }

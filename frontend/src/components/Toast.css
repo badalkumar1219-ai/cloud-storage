@@ -44,7 +44,7 @@
 }
 
 .toast-info {
-  border-left: 4px solid #1a73e8;
+  border-left: 4px solid var(--color-accent);
 }
 
 .toast-warning {
