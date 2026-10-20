@@ -1,5 +1,5 @@
 /* ============================================
-   FileTable Styles
+   FileTable Styles (Complete)
    ============================================ */
 
 .file-table-wrapper {
@@ -9,6 +9,57 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+/* Loading */
+.file-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: #5f6368;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty state */
+.file-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: #5f6368;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.file-empty h3 {
+  margin: 0 0 6px 0;
+  color: #3c4043;
+}
+
+.file-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
 /* Demo banner */
 .demo-banner {
   background: #e8f0fe;
@@ -16,6 +67,13 @@
   padding: 10px 20px;
   font-size: 13px;
   border-bottom: 1px solid #d2e3fc;
+}
+
+.demo-banner code {
+  background: #d2e3fc;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 /* Table */
@@ -48,7 +106,6 @@
 
 .file-row {
   transition: background 0.15s;
-  cursor: pointer;
 }
 
 .file-row:hover {
@@ -72,6 +129,15 @@
   font-weight: 500;
 }
 
+.folder-name {
+  cursor: pointer;
+  color: #1a73e8;
+}
+
+.folder-name:hover {
+  text-decoration: underline;
+}
+
 /* Other columns */
 .col-type,
 .col-size {
@@ -81,6 +147,45 @@
 .col-modified {
   color: #5f6368;
   white-space: nowrap;
+}
+
+/* Actions column */
+.col-actions {
+  width: 100px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.file-row:hover .action-buttons {
+  opacity: 1;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.action-btn:hover {
+  background: #e8f0fe;
+}
+
+.delete-btn:hover,
+.trash-btn:hover {
+  background: #fce8e6;
+}
+
+.restore-btn:hover {
+  background: #e6f4ea;
 }
 
 /* ---- Responsive ---- */
@@ -99,6 +204,10 @@
   .file-table th.col-type,
   .file-table th.col-size {
     display: none;
+  }
+
+  .action-buttons {
+    opacity: 1;
   }
 }
 

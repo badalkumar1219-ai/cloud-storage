@@ -1,5 +1,5 @@
 /* ============================================
-   App.css – Global layout & theme
+   App.css – Global layout & theme (Complete)
    ============================================ */
 
 /* --- CSS Reset & Base --- */
@@ -21,6 +21,37 @@ body {
   background: #f8f9fa;
   color: #3c4043;
   line-height: 1.5;
+}
+
+/* --- App loading screen --- */
+.app-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f8f9fa;
+  gap: 16px;
+}
+
+.app-loading-icon {
+  font-size: 48px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.app-loading p {
+  color: #5f6368;
+  font-size: 16px;
 }
 
 /* --- Layout --- */
@@ -58,6 +89,63 @@ body {
 
 .page-subtitle {
   font-size: 14px;
+  color: #5f6368;
+  margin-top: 4px;
+}
+
+/* --- Breadcrumbs --- */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.breadcrumb-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1a73e8;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.breadcrumb-btn:hover {
+  background: #e8f0fe;
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: #9aa0a6;
+  margin: 0 2px;
+}
+
+/* --- Feature notice --- */
+.feature-notice {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.feature-notice span {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.feature-notice strong {
+  font-size: 15px;
+  color: #202124;
+}
+
+.feature-notice p {
+  font-size: 13px;
   color: #5f6368;
   margin-top: 4px;
 }

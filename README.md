@@ -1,9 +1,25 @@
 # ☁️ CloudBox – Cloud-Based File Storage System
 
-A Google Drive-inspired file storage dashboard built with React (Vite) and Express.
+A full-featured Google Drive-inspired file storage application built with React, Express, AWS S3, and Google OAuth 2.0.
 
-> **Phase 1** – UI dashboard with demo data and a basic Express health endpoint.
-> AWS S3 and Google OAuth 2.0 will be integrated in later phases.
+> **The app runs in demo mode** when cloud credentials aren't configured —
+> you can see the full UI immediately, then enable real features step by step.
+
+---
+
+## Features
+
+- ✅ Google Drive-inspired dashboard UI
+- ✅ Google OAuth 2.0 sign-in
+- ✅ File upload to AWS S3 (drag & drop + file picker)
+- ✅ File download via presigned URLs
+- ✅ Folder creation
+- ✅ Move to Trash / Restore / Permanent delete
+- ✅ Storage usage indicator
+- ✅ Search files and folders
+- ✅ Responsive design (desktop + mobile)
+- ✅ Toast notifications
+- ✅ Demo mode (works without any credentials)
 
 ---
 
@@ -11,42 +27,49 @@ A Google Drive-inspired file storage dashboard built with React (Vite) and Expre
 
 ```
 cloudbox/
-├── frontend/          # React + Vite application
+├── frontend/                    # React + Vite
 │   ├── src/
-│   │   ├── components/   # Reusable UI components
-│   │   ├── data/         # Demo / sample data
-│   │   ├── App.jsx
-│   │   ├── App.css
+│   │   ├── components/          # UI components
+│   │   │   ├── Sidebar.jsx/css
+│   │   │   ├── Header.jsx/css
+│   │   │   ├── FileTable.jsx/css
+│   │   │   ├── UploadArea.jsx/css
+│   │   │   ├── NewFolderModal.jsx/css
+│   │   │   └── Toast.jsx/css
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx   # Auth state management
+│   │   ├── pages/
+│   │   │   └── Login.jsx/css     # Login page
+│   │   ├── services/
+│   │   │   └── api.js            # API client
+│   │   ├── utils/
+│   │   │   └── format.js         # Formatting helpers
+│   │   ├── App.jsx / App.css
 │   │   └── main.jsx
-│   └── package.json
-├── backend/           # Express API server
-│   ├── server.js
+│   └── vite.config.js            # Vite config with API proxy
+├── backend/                     # Express API
+│   ├── config/
+│   │   ├── passport.js           # Google OAuth strategy
+│   │   └── s3.js                 # AWS S3 client
+│   ├── middleware/
+│   │   └── auth.js               # Authentication middleware
+│   ├── routes/
+│   │   ├── auth.js               # Auth routes
+│   │   └── files.js              # File CRUD routes
+│   ├── server.js                 # Express entry point
 │   └── package.json
 ├── .gitignore
 ├── .env.example
-└── README.md          # ← you are here
+└── README.md
 ```
 
 ---
 
-## Prerequisites
+## Quick Start (Demo Mode)
 
-| Tool    | Minimum Version | Check command      |
-| ------- | --------------- | ------------------ |
-| Node.js | 18+             | `node -v`          |
-| npm     | 9+              | `npm -v`           |
+You can run the app immediately **without any cloud credentials**:
 
----
-
-## Getting Started
-
-### 1. Clone or download the project
-
-```bash
-cd "cloud file storage"
-```
-
-### 2. Start the backend
+### 1. Start the backend
 
 ```bash
 cd backend
@@ -54,15 +77,7 @@ npm install
 npm run dev
 ```
 
-The server starts on **http://localhost:5000**.
-Verify it works:
-
-```bash
-curl http://localhost:5000/api/health
-# → { "status": "ok", "message": "CloudBox API is running" }
-```
-
-### 3. Start the frontend (in a new terminal)
+### 2. Start the frontend (new terminal)
 
 ```bash
 cd frontend
@@ -70,42 +85,96 @@ npm install
 npm run dev
 ```
 
-The app opens on **http://localhost:5173** (Vite's default port).
+### 3. Open the app
+
+Visit **http://localhost:5173** — you'll see the full dashboard with demo data.
 
 ---
 
-## Available Scripts
+## Enabling Google OAuth 2.0
 
-| Folder     | Command         | Description                   |
-| ---------- | --------------- | ----------------------------- |
-| `backend`  | `npm run dev`   | Start Express with nodemon    |
-| `backend`  | `npm start`     | Start Express (production)    |
-| `frontend` | `npm run dev`   | Start Vite dev server         |
-| `frontend` | `npm run build` | Build for production          |
-
----
-
-## Phase 1 Checklist
-
-- [x] Professional dashboard UI (Google Drive-inspired)
-- [x] Sidebar navigation (My Files, Shared, Recent, Trash, Storage)
-- [x] File/folder table with demo data
-- [x] Upload area and New Folder button
-- [x] Responsive design (desktop + mobile)
-- [x] Express backend with `/api/health`
-- [ ] AWS S3 integration (Phase 2)
-- [ ] Google OAuth 2.0 authentication (Phase 2)
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project (or select an existing one)
+3. Navigate to **APIs & Services → Credentials**
+4. Click **Create Credentials → OAuth 2.0 Client ID**
+5. Choose **Web application**
+6. Add authorized redirect URI:
+   ```
+   http://localhost:5173/api/auth/google/callback
+   ```
+7. Copy the Client ID and Client Secret
+8. Create `backend/.env` from the template:
+   ```bash
+   cp .env.example backend/.env
+   ```
+9. Fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+10. Restart the backend
 
 ---
 
-## Environment Variables
+## Enabling AWS S3 Storage
 
-Copy `.env.example` to `.env` in the `backend/` folder and fill in your values
-when you reach Phase 2.
+1. Sign in to [AWS Console](https://console.aws.amazon.com/)
+2. **Create an S3 bucket:**
+   - Go to S3 → Create bucket
+   - Choose a region and bucket name
+   - Keep "Block all public access" enabled
+3. **Create an IAM user:**
+   - Go to IAM → Users → Create user
+   - Attach the `AmazonS3FullAccess` policy (or a custom policy for your bucket)
+   - Create an access key (Access Key ID + Secret Access Key)
+4. Add to `backend/.env`:
+   ```
+   AWS_ACCESS_KEY_ID=AKIA...
+   AWS_SECRET_ACCESS_KEY=your_secret
+   AWS_REGION=us-east-1
+   AWS_S3_BUCKET_NAME=my-cloudbox-bucket
+   ```
+5. Restart the backend
 
-```bash
-cp .env.example backend/.env
-```
+---
+
+## API Endpoints
+
+| Method | Endpoint                        | Description            | Auth |
+|--------|---------------------------------|------------------------|------|
+| GET    | `/api/health`                   | Health check           | No   |
+| GET    | `/api/auth/google`              | Start Google OAuth     | No   |
+| GET    | `/api/auth/google/callback`     | OAuth callback         | No   |
+| GET    | `/api/auth/me`                  | Get current user       | No   |
+| POST   | `/api/auth/logout`              | Log out                | No   |
+| GET    | `/api/files?section=&folder=`   | List files             | Yes  |
+| POST   | `/api/files/upload`             | Upload file(s)         | Yes  |
+| GET    | `/api/files/download?key=`      | Get download URL       | Yes  |
+| DELETE | `/api/files?key=`               | Delete permanently     | Yes  |
+| POST   | `/api/files/folder`             | Create folder          | Yes  |
+| POST   | `/api/files/trash`              | Move to trash          | Yes  |
+| POST   | `/api/files/restore`            | Restore from trash     | Yes  |
+| GET    | `/api/files/storage`            | Get storage usage      | Yes  |
+
+---
+
+## Scripts
+
+| Folder     | Command         | Description                |
+|------------|-----------------|----------------------------|
+| `backend`  | `npm run dev`   | Start with auto-reload     |
+| `backend`  | `npm start`     | Start (production)         |
+| `frontend` | `npm run dev`   | Vite dev server            |
+| `frontend` | `npm run build` | Production build           |
+
+---
+
+## Tech Stack
+
+| Layer          | Technology                          |
+|----------------|-------------------------------------|
+| Frontend       | React 19 + Vite                     |
+| Styling        | CSS (responsive, mobile-first)      |
+| Backend        | Node.js + Express                   |
+| Authentication | Google OAuth 2.0 (Passport.js)      |
+| Cloud Storage  | AWS S3 (SDK v3)                     |
+| File Upload    | Multer (memory storage → S3)        |
 
 ---
 

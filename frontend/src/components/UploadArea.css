@@ -1,5 +1,5 @@
 /* ============================================
-   UploadArea Styles
+   UploadArea Styles (Complete)
    ============================================ */
 
 .upload-area {
@@ -10,11 +10,24 @@
   background: #f8fbff;
   transition: border-color 0.2s, background 0.2s;
   cursor: pointer;
+  position: relative;
 }
 
-.upload-area:hover {
+.upload-area:hover,
+.upload-area.drag-over {
   border-color: #1a73e8;
   background: #eef4ff;
+}
+
+.upload-area.uploading {
+  border-color: #1a73e8;
+  background: #eef4ff;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.upload-hidden-input {
+  display: none;
 }
 
 .upload-icon {
@@ -40,6 +53,23 @@
   color: #9aa0a6;
   font-style: italic;
   margin: 0;
+}
+
+/* Upload spinner */
+.upload-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #d2e3fc;
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: upload-spin 0.8s linear infinite;
+  margin: 0 auto 16px auto;
+}
+
+@keyframes upload-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---- Responsive ---- */

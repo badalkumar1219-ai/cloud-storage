@@ -1,17 +1,30 @@
 // ============================================
-// Sidebar – Navigation panel
+// Sidebar – Navigation panel (Complete)
 // ============================================
 
+import { useAuth } from "../context/AuthContext";
+import { formatFileSize } from "../utils/format";
 import "./Sidebar.css";
 
-function Sidebar({ activeNav, onNavChange }) {
+function Sidebar({
+  activeNav,
+  onNavChange,
+  onUploadClick,
+  onNewFolderClick,
+  storageUsed,
+  storageLimit,
+}) {
+  const { demoMode } = useAuth();
+
   const navItems = [
     { id: "my-files", label: "My Files", icon: "📁" },
     { id: "shared", label: "Shared with Me", icon: "👥" },
     { id: "recent", label: "Recent", icon: "🕐" },
     { id: "trash", label: "Trash", icon: "🗑️" },
-    { id: "storage", label: "Storage", icon: "💾" },
   ];
+
+  const usedPercent =
+    storageLimit > 0 ? Math.round((storageUsed / storageLimit) * 100) : 0;
 
   return (
     <aside className="sidebar">
@@ -23,10 +36,10 @@ function Sidebar({ activeNav, onNavChange }) {
 
       {/* Action Buttons */}
       <div className="sidebar-actions">
-        <button className="btn btn-upload">
+        <button className="btn btn-upload" onClick={onUploadClick}>
           <span className="btn-icon">⬆️</span> Upload Files
         </button>
-        <button className="btn btn-folder">
+        <button className="btn btn-folder" onClick={onNewFolderClick}>
           <span className="btn-icon">➕</span> New Folder
         </button>
       </div>
@@ -49,15 +62,19 @@ function Sidebar({ activeNav, onNavChange }) {
       <div className="storage-indicator">
         <div className="storage-header">
           <span>Storage</span>
-          <span>2.3 GB of 15 GB</span>
+          <span>
+            {formatFileSize(storageUsed)} of {formatFileSize(storageLimit)}
+          </span>
         </div>
         <div className="storage-bar">
           <div
             className="storage-fill"
-            style={{ width: "15%" }}
+            style={{ width: `${Math.min(usedPercent, 100)}%` }}
           ></div>
         </div>
-        <p className="storage-note">Demo data — no real storage used</p>
+        {demoMode && (
+          <p className="storage-note">Demo data — no real storage used</p>
+        )}
       </div>
     </aside>
   );

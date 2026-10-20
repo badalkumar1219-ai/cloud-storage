@@ -1,7 +1,7 @@
 {
   "name": "cloudbox-backend",
-  "version": "1.0.0",
-  "description": "CloudBox Express API server",
+  "version": "2.0.0",
+  "description": "CloudBox Express API server with Google OAuth and AWS S3",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,8 +11,16 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1153.0",
+    "@aws-sdk/s3-request-presigner": "^3.1153.0",
     "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
     "express": "^5.3.0",
-    "nodemon": "^3.1.14"
+    "express-session": "^1.19.0",
+    "multer": "^2.4.0",
+    "nodemon": "^3.1.14",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "uuid": "^14.0.3"
   }
 }
