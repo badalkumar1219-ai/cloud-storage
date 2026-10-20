@@ -1,5 +1,5 @@
 // ============================================
-// FileTable – Displays files & folders (Complete)
+// FileTable – Displays files & folders (with Sharing)
 // ============================================
 
 import { formatFileSize, formatDate, getFileType, getFileIcon } from "../utils/format";
@@ -14,6 +14,7 @@ function FileTable({
   onMoveToTrash,
   onDelete,
   onRestore,
+  onShare,
   activeNav,
 }) {
   const { demoMode } = useAuth();
@@ -38,6 +39,8 @@ function FileTable({
           <p>
             {activeNav === "trash"
               ? "Your trash is empty"
+              : activeNav === "shared"
+              ? "No files have been shared with you yet"
               : "Upload files or create a folder to get started"}
           </p>
         </div>
@@ -45,10 +48,13 @@ function FileTable({
     );
   }
 
+  // "Shared with Me" view has extra columns
+  const isSharedView = activeNav === "shared";
+
   return (
     <div className="file-table-wrapper">
       {/* Demo data banner */}
-      {demoMode && (
+      {demoMode && activeNav !== "shared" && (
         <div className="demo-banner">
           ℹ️ These files are <strong>demo data</strong> for preview purposes.
           Configure AWS S3 in your <code>.env</code> file to enable real file
@@ -60,9 +66,12 @@ function FileTable({
         <thead>
           <tr>
             <th className="col-name">Name</th>
+            {isSharedView && <th className="col-shared-by">Shared By</th>}
             <th className="col-type">Type</th>
             <th className="col-size">Size</th>
-            <th className="col-modified">Last Modified</th>
+            <th className="col-modified">
+              {isSharedView ? "Shared On" : "Last Modified"}
+            </th>
             <th className="col-actions">Actions</th>
           </tr>
         </thead>
@@ -82,6 +91,23 @@ function FileTable({
                   {file.name}
                 </span>
               </td>
+              {isSharedView && (
+                <td className="col-shared-by">
+                  <div className="shared-by-info">
+                    {file.sharedByAvatar ? (
+                      <img
+                        src={file.sharedByAvatar}
+                        alt=""
+                        className="shared-by-avatar"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="shared-by-icon">👤</span>
+                    )}
+                    <span>{file.sharedBy}</span>
+                  </div>
+                </td>
+              )}
               <td className="col-type">{getFileType(file)}</td>
               <td className="col-size">{formatFileSize(file.size)}</td>
               <td className="col-modified">{formatDate(file.lastModified)}</td>
@@ -104,8 +130,32 @@ function FileTable({
                         🗑️
                       </button>
                     </>
+                  ) : isSharedView ? (
+                    <>
+                      {file.permission === "download" && (
+                        <button
+                          className="action-btn download-btn"
+                          title="Download"
+                          onClick={() => onDownload?.(file)}
+                        >
+                          ⬇️
+                        </button>
+                      )}
+                      <span className="permission-badge">
+                        {file.permission === "download" ? "📥" : "👁️"}
+                      </span>
+                    </>
                   ) : (
                     <>
+                      {!file.isFolder && (
+                        <button
+                          className="action-btn share-btn"
+                          title="Share"
+                          onClick={() => onShare?.(file)}
+                        >
+                          🔗
+                        </button>
+                      )}
                       {!file.isFolder && (
                         <button
                           className="action-btn download-btn"

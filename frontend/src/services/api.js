@@ -106,6 +106,46 @@ export function getStorageUsage() {
   return request("/files/storage");
 }
 
+// ─── Sharing ──────────────────────────────────────────
+
+export function shareFile({ fileKey, fileName, fileSize, recipientEmail, permission }) {
+  return request("/share", {
+    method: "POST",
+    body: JSON.stringify({ fileKey, fileName, fileSize, recipientEmail, permission }),
+  });
+}
+
+export function getSharedWithMe() {
+  return request("/share/shared-with-me");
+}
+
+export function getMyShares() {
+  return request("/share/my-shares");
+}
+
+export function getFileShares(fileKey) {
+  return request(`/share/file-shares?fileKey=${encodeURIComponent(fileKey)}`);
+}
+
+export function removeShare(shareId) {
+  return request(`/share/${shareId}`, { method: "DELETE" });
+}
+
+export function createShareLink({ fileKey, fileName, fileSize, permission }) {
+  return request("/share/link", {
+    method: "POST",
+    body: JSON.stringify({ fileKey, fileName, fileSize, permission }),
+  });
+}
+
+export function deleteShareLink(linkId) {
+  return request(`/share/link/${linkId}`, { method: "DELETE" });
+}
+
+export function downloadSharedFile(shareId) {
+  return request(`/share/download/${shareId}`);
+}
+
 // ─── Health ───────────────────────────────────────────
 
 export function healthCheck() {

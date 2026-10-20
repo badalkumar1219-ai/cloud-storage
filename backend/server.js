@@ -5,6 +5,7 @@
 //   • Google OAuth 2.0 authentication
 //   • AWS S3 file storage
 //   • Demo mode when credentials are not set
+//   • File sharing (by email and link)
 //   • Health check endpoint
 // ============================================
 
@@ -18,6 +19,7 @@ const passport = require("./config/passport");
 // Import routes
 const authRoutes = require("./routes/auth");
 const fileRoutes = require("./routes/files");
+const shareRoutes = require("./routes/share");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -74,6 +76,9 @@ app.use("/api/auth", authRoutes);
 
 // File management routes
 app.use("/api/files", fileRoutes);
+
+// Sharing routes
+app.use("/api/share", shareRoutes);
 
 // --------------- Error handling ---------------
 

@@ -1,5 +1,5 @@
 // ============================================
-// App.jsx – Main CloudBox Application (Complete)
+// App.jsx – Main CloudBox Application (with Sharing)
 // ============================================
 
 import { useState, useEffect, useCallback } from "react";
@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import FileTable from "./components/FileTable";
 import UploadArea from "./components/UploadArea";
 import NewFolderModal from "./components/NewFolderModal";
+import ShareModal from "./components/ShareModal";
 import { ToastContainer } from "./components/Toast";
 import Login from "./pages/Login";
 import {
@@ -20,6 +21,8 @@ import {
   restoreFromTrash,
   createFolder,
   getStorageUsage,
+  getSharedWithMe,
+  downloadSharedFile,
 } from "./services/api";
 import "./App.css";
 
@@ -37,6 +40,10 @@ function App() {
   const [folderModalOpen, setFolderModalOpen] = useState(false);
   const [currentFolder, setCurrentFolder] = useState("");
 
+  // Share state
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [fileToShare, setFileToShare] = useState(null);
+
   const [storageUsed, setStorageUsed] = useState(0);
   const [storageLimit, setStorageLimit] = useState(16106127360); // 15 GB
 
@@ -51,9 +58,15 @@ function App() {
   const loadFiles = useCallback(async () => {
     setFilesLoading(true);
     try {
-      const section = activeNav === "trash" ? "trash" : "files";
-      const data = await listFiles(section, currentFolder);
-      setFiles(data.files || []);
+      if (activeNav === "shared") {
+        // Load files shared with the current user
+        const data = await getSharedWithMe();
+        setFiles(data.files || []);
+      } else {
+        const section = activeNav === "trash" ? "trash" : "files";
+        const data = await listFiles(section, currentFolder);
+        setFiles(data.files || []);
+      }
     } catch (err) {
       console.error("Failed to load files:", err);
       addToast("Failed to load files: " + err.message, "error");
@@ -109,7 +122,7 @@ function App() {
     try {
       const result = await uploadFiles(selectedFiles, currentFolder);
       addToast(result.message, "success");
-      loadFiles(); // Refresh the file list
+      loadFiles();
     } catch (err) {
       addToast("Upload failed: " + err.message, "error");
     } finally {
@@ -118,13 +131,27 @@ function App() {
   }
 
   async function handleDownload(file) {
+    // For shared files, use the share download endpoint
+    if (activeNav === "shared" && file.shareId) {
+      if (demoMode) {
+        addToast("Configure AWS S3 credentials to enable downloads", "warning");
+        return;
+      }
+      try {
+        const data = await downloadSharedFile(file.shareId);
+        window.open(data.url, "_blank");
+      } catch (err) {
+        addToast("Download failed: " + err.message, "error");
+      }
+      return;
+    }
+
     if (demoMode) {
       addToast("Configure AWS S3 credentials to enable downloads", "warning");
       return;
     }
     try {
       const data = await downloadFile(file.key);
-      // Open the presigned URL in a new tab to trigger download
       window.open(data.url, "_blank");
     } catch (err) {
       addToast("Download failed: " + err.message, "error");
@@ -187,7 +214,7 @@ function App() {
       loadFiles();
     } catch (err) {
       addToast("Failed to create folder: " + err.message, "error");
-      throw err; // Let modal know it failed
+      throw err;
     }
   }
 
@@ -200,8 +227,15 @@ function App() {
 
   function handleNavChange(nav) {
     setActiveNav(nav);
-    setCurrentFolder(""); // Reset folder when switching nav
+    setCurrentFolder("");
     setSidebarOpen(false);
+  }
+
+  // ─── Share actions ─────────────────────────────────
+
+  function handleShare(file) {
+    setFileToShare(file);
+    setShareModalOpen(true);
   }
 
   // ─── Search filtering ─────────────────────────────
@@ -306,20 +340,6 @@ function App() {
             <UploadArea onFilesSelected={handleUpload} uploading={uploading} />
           )}
 
-          {/* Shared with Me notice */}
-          {activeNav === "shared" && (
-            <div className="feature-notice">
-              <span>👥</span>
-              <div>
-                <strong>Shared with Me</strong>
-                <p>
-                  File sharing requires a database to store sharing metadata.
-                  This feature will be available in a future update.
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* Recent files notice */}
           {activeNav === "recent" && (
             <div className="feature-notice">
@@ -342,6 +362,7 @@ function App() {
             onMoveToTrash={handleMoveToTrash}
             onDelete={handleDelete}
             onRestore={handleRestore}
+            onShare={handleShare}
             activeNav={activeNav}
           />
         </div>
@@ -352,6 +373,17 @@ function App() {
         isOpen={folderModalOpen}
         onClose={() => setFolderModalOpen(false)}
         onSubmit={handleCreateFolder}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={shareModalOpen}
+        file={fileToShare}
+        onClose={() => {
+          setShareModalOpen(false);
+          setFileToShare(null);
+        }}
+        onToast={addToast}
       />
 
       {/* Toast Notifications */}
