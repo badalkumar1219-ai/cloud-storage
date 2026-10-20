@@ -1,0 +1,113 @@
+/* ============================================
+   FileTable Styles
+   ============================================ */
+
+.file-table-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Demo banner */
+.demo-banner {
+  background: #e8f0fe;
+  color: #1a73e8;
+  padding: 10px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid #d2e3fc;
+}
+
+/* Table */
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.file-table thead {
+  background: #f8f9fa;
+}
+
+.file-table th {
+  text-align: left;
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.file-table td {
+  padding: 14px 20px;
+  font-size: 14px;
+  color: #3c4043;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.file-row {
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.file-row:hover {
+  background: #f8f9fa;
+}
+
+/* Name column */
+.col-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+
+.file-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.file-name {
+  font-weight: 500;
+}
+
+/* Other columns */
+.col-type,
+.col-size {
+  color: #5f6368;
+}
+
+.col-modified {
+  color: #5f6368;
+  white-space: nowrap;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .file-table th,
+  .file-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .col-type,
+  .col-size {
+    display: none;
+  }
+
+  .file-table th.col-type,
+  .file-table th.col-size {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .col-modified {
+    display: none;
+  }
+
+  .file-table th.col-modified {
+    display: none;
+  }
+}

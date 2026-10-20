@@ -1,0 +1,58 @@
+/* ============================================
+   UploadArea Styles
+   ============================================ */
+
+.upload-area {
+  border: 2px dashed #c4d7f2;
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  background: #f8fbff;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  border-color: #1a73e8;
+  background: #eef4ff;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.upload-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3c4043;
+  margin: 0 0 6px 0;
+}
+
+.upload-subtitle {
+  font-size: 14px;
+  color: #5f6368;
+  margin: 0 0 16px 0;
+}
+
+.upload-note {
+  font-size: 12px;
+  color: #9aa0a6;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .upload-area {
+    padding: 28px 16px;
+  }
+
+  .upload-icon {
+    font-size: 36px;
+  }
+
+  .upload-title {
+    font-size: 16px;
+  }
+}

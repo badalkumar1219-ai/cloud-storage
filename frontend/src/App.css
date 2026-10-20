@@ -1,0 +1,103 @@
+/* ============================================
+   App.css – Global layout & theme
+   ============================================ */
+
+/* --- CSS Reset & Base --- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  background: #f8f9fa;
+  color: #3c4043;
+  line-height: 1.5;
+}
+
+/* --- Layout --- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 260px; /* matches sidebar width */
+  display: flex;
+  flex-direction: column;
+}
+
+.content-area {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+/* --- Page Header --- */
+.page-header {
+  margin-bottom: 4px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #5f6368;
+  margin-top: 4px;
+}
+
+/* --- Mobile overlay --- */
+.sidebar-overlay {
+  display: none;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  /* By default sidebar is hidden on mobile */
+  .app-layout .sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    transition: transform 0.3s ease;
+  }
+
+  /* When open */
+  .app-layout.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .app-layout.sidebar-open .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+  }
+
+  .content-area {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+}
