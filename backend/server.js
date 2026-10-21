@@ -24,6 +24,10 @@ const shareRoutes = require("./routes/share");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.get("/", (_req, res) => {
+  res.send("Backend is running successfully!");
+});
+
 // --------------- Middleware ---------------
 
 // CORS – allow the React frontend
