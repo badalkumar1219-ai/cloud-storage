@@ -4,9 +4,10 @@
 // All backend requests go through this module.
 // Uses relative URLs (Vite proxy handles routing).
 // ============================================
-
-const API_BASE = "/api";
-
+const API_BASE = `${
+  (import.meta.env.VITE_API_URL ||
+    "https://cloud-storage-backend-qwk4.onrender.com").replace(/\/$/, "")
+}/api`;
 /**
  * Generic fetch wrapper with JSON handling
  */
@@ -48,7 +49,7 @@ export function logout() {
 }
 
 export function getGoogleAuthUrl() {
-  return "/api/auth/google";
+  return `${API_BASE}/auth/google`;
 }
 
 // ─── Files ────────────────────────────────────────────

@@ -351,6 +351,19 @@ function App() {
             <UploadArea onFilesSelected={handleUpload} uploading={uploading} />
           )}
 
+          {activeNav === "my-files" && !demoMode && !canUpload && (
+            <div className="feature-notice">
+              <span>🔒</span>
+              <div>
+                <strong>Uploads are restricted</strong>
+                <p>
+                  This Google account can view files but is not authorized to
+                  upload them. Sign in with the authorized account to upload.
+                </p>
+              </div>
+            </div>
+          )}
+
           {activeNav === "my-files" && (
             <DashboardOverview
               files={files}
