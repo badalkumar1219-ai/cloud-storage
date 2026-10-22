@@ -1,92 +1,130 @@
-// ============================================
-// Auth Routes – Google OAuth 2.0
-// ============================================
-// GET  /api/auth/google          → Start Google login
-// GET  /api/auth/google/callback → Google callback
-// GET  /api/auth/me              → Get current user
-// POST /api/auth/logout          → Log out
-// ============================================
-
+const crypto = require("crypto");
+const { promisify } = require("util");
+const { v4: uuidv4 } = require("uuid");
 const router = require("express").Router();
-const passport = require("passport");
+const { isS3Configured } = require("../config/s3");
+const {
+  addUser,
+  getUserByEmail,
+  getUserById,
+  toPublicUser,
+} = require("../config/userStore");
 const { isAuthorizedUploader } = require("../middleware/auth");
 
-const isOAuthConfigured =
-  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET;
+const scrypt = promisify(crypto.scrypt);
+const PASSWORD_BYTES = 64;
 
-// ─── Start Google OAuth flow ──────────────────────────
-router.get("/google", (req, res, next) => {
-  if (!isOAuthConfigured) {
-    return res.status(503).json({
-      error: "Google OAuth is not configured.",
-      hint: "Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to your .env file.",
+function normalizeEmail(email) {
+  return typeof email === "string" ? email.trim().toLowerCase() : "";
+}
+
+function isValidEmail(email) {
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function hashPassword(password, salt) {
+  const hash = await scrypt(password, salt, PASSWORD_BYTES);
+  return hash.toString("hex");
+}
+
+function establishSession(req, userId) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => {
+      if (error) return reject(error);
+      req.session.userId = userId;
+      req.session.save((saveError) => {
+        if (saveError) return reject(saveError);
+        resolve();
+      });
     });
+  });
+}
+
+function respondWithUser(req, res, user) {
+  return establishSession(req, user.id).then(() => {
+    res.json({
+      user: toPublicUser(user),
+      demoMode: !isS3Configured,
+      canUpload: isAuthorizedUploader(user),
+    });
+  });
+}
+
+router.post("/register", async (req, res) => {
+  const { name, password } = req.body || {};
+  const email = normalizeEmail(req.body?.email);
+  const displayName = typeof name === "string" ? name.trim() : "";
+
+  if (!displayName || displayName.length > 80) {
+    return res.status(400).json({ error: "Name must be between 1 and 80 characters" });
   }
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })(req, res, next);
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: "Enter a valid email address" });
+  }
+  if (typeof password !== "string" || password.length < 8 || password.length > 128) {
+    return res.status(400).json({ error: "Password must be between 8 and 128 characters" });
+  }
+  if (getUserByEmail(email)) {
+    return res.status(409).json({ error: "An account with this email already exists" });
+  }
+
+  const salt = crypto.randomBytes(16).toString("hex");
+  const user = {
+    id: uuidv4(),
+    name: displayName,
+    email,
+    avatar: "",
+    passwordSalt: salt,
+    passwordHash: await hashPassword(password, salt),
+  };
+
+  if (!addUser(user)) {
+    return res.status(409).json({ error: "An account with this email already exists" });
+  }
+
+  return respondWithUser(req, res, user);
 });
 
-// ─── Google OAuth callback ────────────────────────────
-router.get(
-  "/google/callback",
-  (req, res, next) => {
-    if (!isOAuthConfigured) {
-      return res.redirect(process.env.CLIENT_URL || "http://localhost:5173");
-    }
-    passport.authenticate("google", {
-      failureRedirect:
-        (process.env.CLIENT_URL || "http://localhost:5173") + "/login",
-    })(req, res, next);
-  },
-  (_req, res) => {
-    // Successful login – redirect to the dashboard
-    res.redirect(process.env.CLIENT_URL || "http://localhost:5173");
-  }
-);
+router.post("/login", async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  const password = req.body?.password;
 
-// ─── Get current user ─────────────────────────────────
+  if (!isValidEmail(email) || typeof password !== "string" || password.length > 128) {
+    return res.status(400).json({ error: "Enter a valid email and password" });
+  }
+
+  const user = getUserByEmail(email);
+  const salt = user?.passwordSalt || "cloudbox-invalid-account";
+  const passwordHash = await hashPassword(password, salt);
+
+  if (!user || !crypto.timingSafeEqual(
+    Buffer.from(passwordHash, "hex"),
+    Buffer.from(user.passwordHash, "hex")
+  )) {
+    return res.status(401).json({ error: "Email or password is incorrect" });
+  }
+
+  return respondWithUser(req, res, user);
+});
+
 router.get("/me", (req, res) => {
-  if (isOAuthConfigured) {
-    // Real auth mode
-    if (req.isAuthenticated && req.isAuthenticated()) {
-      return res.json({
-        user: req.user,
-        demoMode: false,
-        canUpload: isAuthorizedUploader(req.user),
-      });
-    }
-    return res.json({ user: null, demoMode: false, canUpload: false });
-  }
-
-  // Demo mode – return a demo user
+  const user = req.session.userId ? getUserById(req.session.userId) : null;
   res.json({
-    user: {
-      id: "demo-user",
-      name: "Demo User",
-      email: "demo@cloudbox.local",
-      avatar: "",
-    },
-    demoMode: true,
-    canUpload: false,
+    user,
+    demoMode: !isS3Configured,
+    canUpload: user ? isAuthorizedUploader(user) : false,
   });
 });
 
-// ─── Logout ───────────────────────────────────────────
-router.post("/logout", (req, res) => {
-  if (req.logout) {
-    req.logout((err) => {
-      if (err) {
-        return res.status(500).json({ error: "Logout failed" });
-      }
-      req.session?.destroy(() => {
-        res.clearCookie("connect.sid");
-        res.json({ message: "Logged out successfully" });
-      });
-    });
-  } else {
-    res.json({ message: "Logged out successfully" });
+router.post("/logout", (req, res, next) => {
+  if (!req.session) {
+    return res.json({ message: "Logged out successfully" });
   }
+  req.session.destroy((error) => {
+    if (error) return next(error);
+    res.clearCookie("connect.sid");
+    res.json({ message: "Logged out successfully" });
+  });
 });
 
 module.exports = router;

@@ -28,6 +28,12 @@ function readStore() {
  * Write the entire store to disk.
  */
 function writeStore(data) {
+  const parentDir = path.dirname(DATA_FILE);
+
+  if (!fs.existsSync(parentDir)) {
+    fs.mkdirSync(parentDir, { recursive: true });
+  }
+
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 

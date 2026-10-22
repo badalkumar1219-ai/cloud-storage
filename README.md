@@ -1,16 +1,16 @@
 # ☁️ CloudBox – Cloud-Based File Storage System
 
-A full-featured Google Drive-inspired file storage application built with React, Express, AWS S3, and Google OAuth 2.0.
+A full-featured Google Drive-inspired file storage application built with React, Express, AWS S3, and email/password authentication.
 
-> **The app runs in demo mode** when cloud credentials aren't configured —
-> you can see the full UI immediately, then enable real features step by step.
+> **The app runs in demo storage mode** when AWS credentials aren't configured.
+> Create an account to open the dashboard and explore the demo files.
 
 ---
 
 ## Features
 
 - ✅ Google Drive-inspired dashboard UI
-- ✅ Google OAuth 2.0 sign-in
+- ✅ Email/password registration and sign-in
 - ✅ File upload to AWS S3 (drag & drop + file picker)
 - ✅ File download via presigned URLs
 - ✅ Folder creation
@@ -49,7 +49,7 @@ cloudbox/
 │   └── vite.config.js            # Vite config with API proxy
 ├── backend/                     # Express API
 │   ├── config/
-│   │   ├── passport.js           # Google OAuth strategy
+│   │   ├── userStore.js          # Local account persistence
 │   │   └── s3.js                 # AWS S3 client
 │   ├── middleware/
 │   │   └── auth.js               # Authentication middleware
@@ -87,34 +87,27 @@ npm run dev
 
 ### 3. Open the app
 
-Visit **http://localhost:5173** — you'll see the full dashboard with demo data.
+Visit **http://localhost:5173**, create an account, and the dashboard will open with demo data.
 
 ---
 
-## Enabling Google OAuth 2.0
+## Accounts and authentication
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project (or select an existing one)
-3. Navigate to **APIs & Services → Credentials**
-4. Click **Create Credentials → OAuth 2.0 Client ID**
-5. Choose **Web application**
-6. Add authorized redirect URI:
-   ```
-   http://localhost:5173/api/auth/google/callback
-   ```
-7. Copy the Client ID and Client Secret
-8. Create `backend/.env` from the template:
-   ```bash
-   cp .env.example backend/.env
-   ```
-9. Fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
-10. Set `UPLOAD_AUTHORIZED_EMAIL` in `backend/.env` to the Gmail account allowed to upload files
-11. Restart the backend
+Create an account from the sign-in screen with a name, email address, and password
+(at least 8 characters). Accounts are stored in `backend/data/users.json`; passwords
+are stored as salted scrypt hashes, not as plain text. This local JSON store is
+intended for a single backend instance; use a database-backed account store for
+multi-instance deployments.
 
-Only the configured account can upload files. The backend checks the signed-in Google account
-on every file-upload request; other signed-in users can still use the other available features.
-The upload controls are also hidden for accounts without upload permission. If
-`UPLOAD_AUTHORIZED_EMAIL` is unset, uploads are denied to everyone.
+Sessions use an HTTP-only cookie. Set a strong, unique `SESSION_SECRET` in
+`backend/.env` before deployment. In production, serve the app over HTTPS.
+Accounts created before this change through Google sign-in are not migrated.
+Files in S3 remain stored under their previous Google profile IDs and are not
+automatically attached to newly registered accounts.
+
+To restrict uploads to one account, set `UPLOAD_AUTHORIZED_EMAIL` to that
+registered account's email address. Other registered users can still use the
+available file features. If the setting is unset, uploads are denied.
 
 ---
 
@@ -145,8 +138,8 @@ The upload controls are also hidden for accounts without upload permission. If
 | Method | Endpoint                        | Description            | Auth |
 |--------|---------------------------------|------------------------|------|
 | GET    | `/api/health`                   | Health check           | No   |
-| GET    | `/api/auth/google`              | Start Google OAuth     | No   |
-| GET    | `/api/auth/google/callback`     | OAuth callback         | No   |
+| POST   | `/api/auth/register`            | Create an account      | No   |
+| POST   | `/api/auth/login`               | Sign in                | No   |
 | GET    | `/api/auth/me`                  | Get current user       | No   |
 | POST   | `/api/auth/logout`              | Log out                | No   |
 | GET    | `/api/files?section=&folder=`   | List files             | Yes  |
@@ -178,7 +171,7 @@ The upload controls are also hidden for accounts without upload permission. If
 | Frontend       | React 19 + Vite                     |
 | Styling        | CSS (responsive, mobile-first)      |
 | Backend        | Node.js + Express                   |
-| Authentication | Google OAuth 2.0 (Passport.js)      |
+| Authentication | Email/password (scrypt + sessions)  |
 | Cloud Storage  | AWS S3 (SDK v3)                     |
 | File Upload    | Multer (memory storage → S3)        |
 

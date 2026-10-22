@@ -4,10 +4,12 @@
 // All backend requests go through this module.
 // Uses relative URLs (Vite proxy handles routing).
 // ============================================
-const API_BASE = `${
-  (import.meta.env.VITE_API_URL ||
-    "https://cloud-storage-backend-qwk4.onrender.com").replace(/\/$/, "")
-}/api`;
+const API_BASE = import.meta.env.DEV
+  ? "/api"
+  : `${
+      (import.meta.env.VITE_API_URL ||
+        "https://cloud-storage-backend-qwk4.onrender.com").replace(/\/$/, "")
+    }/api`;
 /**
  * Generic fetch wrapper with JSON handling
  */
@@ -44,12 +46,22 @@ export function getMe() {
   return request("/auth/me");
 }
 
-export function logout() {
-  return request("/auth/logout", { method: "POST" });
+export function register({ name, email, password }) {
+  return request("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ name, email, password }),
+  });
 }
 
-export function getGoogleAuthUrl() {
-  return `${API_BASE}/auth/google`;
+export function login({ email, password }) {
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export function logout() {
+  return request("/auth/logout", { method: "POST" });
 }
 
 // ─── Files ────────────────────────────────────────────

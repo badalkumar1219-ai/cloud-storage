@@ -357,8 +357,8 @@ function App() {
               <div>
                 <strong>Uploads are restricted</strong>
                 <p>
-                  This Google account can view files but is not authorized to
-                  upload them. Sign in with the authorized account to upload.
+                  This account can view files but is not authorized to upload
+                  them. Sign in with the authorized account to upload.
                 </p>
               </div>
             </div>

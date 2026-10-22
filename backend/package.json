@@ -1,7 +1,7 @@
 {
   "name": "cloudbox-backend",
   "version": "2.0.0",
-  "description": "CloudBox Express API server with Google OAuth and AWS S3",
+  "description": "CloudBox Express API server with email/password authentication and AWS S3",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -19,8 +19,6 @@
     "express-session": "^1.19.0",
     "multer": "^2.4.0",
     "nodemon": "^3.1.14",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
     "uuid": "^14.0.3"
   }
 }

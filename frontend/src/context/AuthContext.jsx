@@ -6,7 +6,12 @@
 // ============================================
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { getMe, logout as apiLogout } from "../services/api";
+import {
+  getMe,
+  login as apiLogin,
+  logout as apiLogout,
+  register as apiRegister,
+} from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -45,11 +50,27 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  async function handleLogin(credentials) {
+    const data = await apiLogin(credentials);
+    setUser(data.user);
+    setDemoMode(data.demoMode);
+    setCanUpload(data.canUpload === true);
+  }
+
+  async function handleRegister(account) {
+    const data = await apiRegister(account);
+    setUser(data.user);
+    setDemoMode(data.demoMode);
+    setCanUpload(data.canUpload === true);
+  }
+
   const value = {
     user,
     demoMode,
     canUpload,
     loading,
+    login: handleLogin,
+    register: handleRegister,
     logout: handleLogout,
   };
 

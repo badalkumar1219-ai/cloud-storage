@@ -2,7 +2,7 @@
 // CloudBox – Express Backend Server (Complete)
 // ============================================
 // Features:
-//   • Google OAuth 2.0 authentication
+//   • Email and password authentication
 //   • AWS S3 file storage
 //   • Demo mode when credentials are not set
 //   • File sharing (by email and link)
@@ -14,7 +14,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
-const passport = require("./config/passport");
+const { isS3Configured } = require("./config/s3");
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -23,6 +23,15 @@ const shareRoutes = require("./routes/share");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (process.env.NODE_ENV === "production" && !sessionSecret) {
+  throw new Error("SESSION_SECRET must be configured in production");
+}
+
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 app.get("/", (_req, res) => {
   res.send("Backend is running successfully!");
@@ -47,19 +56,17 @@ app.use(express.urlencoded({ extended: true }));
 //       Use Redis or a database store in production.
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "cloudbox-dev-secret-change-me",
+    secret: sessionSecret || "cloudbox-dev-secret-change-me",
     resave: false,
     saveUninitialized: false,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      secure: false,                // set to true with HTTPS in production
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
     },
   })
 );
-
-// Passport (Google OAuth)
-app.use(passport.initialize());
-app.use(passport.session());
 
 // --------------- Routes ---------------
 
@@ -69,9 +76,7 @@ app.get("/api/health", (_req, res) => {
     status: "ok",
     message: "CloudBox API is running",
     timestamp: new Date().toISOString(),
-    demoMode: !(
-      process.env.GOOGLE_CLIENT_ID && process.env.AWS_ACCESS_KEY_ID
-    ),
+    demoMode: !isS3Configured,
   });
 });
 
